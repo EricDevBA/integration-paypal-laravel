@@ -15,5 +15,5 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::post(‘/pagar’, ‘PagamentoController@pagarComPayPal’)->name(‘pagar_com_paypal’);
+Route::post('/pagar', 'PagamentoController@pagarComPaypal')->name('pagar_com_paypal');
 

@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use Faker\Provider\sk_SK\Payment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Input;
 use PayPal\Api\Amount;
 use PayPal\Api\Item;
 use PayPal\Api\ItemList;
+use PayPal\Api\Payer;
+use PayPal\Api\PaymentExecution;
 use PayPal\Api\RedirectUrls;
 use PayPal\Api\Transaction;
 use PayPal\Auth\OAuthTokenCredential;
@@ -43,7 +46,7 @@ class PagamentoController extends Controller
         $item_1 = new Item();
         $item_1->setName('Item_1')->setCurrency('BRL')->setQuantity(1)->setPrice($request->get('amount'));
         $lista_itens = new ItemList();
-        $lista_itens->setItems(arraty($item_1));
+        $lista_itens->setItems(array($item_1));
         $valor = new Amount();
         $valor->setCurrency('BRL')->setTotal($request->get('amount'));
 
@@ -88,11 +91,53 @@ class PagamentoController extends Controller
 
     }
 
+
+    // Adiciona  o id do pagamento a sessão **/
     Session::put('pagamento_paypal_id', $pagamento->getId());
 
-    if(isset($url_redirecionar));
+    if(isset($url_redirecionar)){
 
+    }
 
 }
+
+    public function statusPagamento()  // Verifica se o usuário aprovou ou não o pagamento //
+    {
+        $id_pagamento = Session::get('pagamento_paypal_id');  // Resgata o id do pagamento armazenado na sessao //
+
+
+        Session::forget('pagamento_paypal_id');    // Limpa o id do pagamento armazenado na sessao //
+
+        if(empty(Input::get('PayerID')) || empty(Input::get('token'))) {
+
+            \Session::put('erro','Falha na Transação.');
+            return Redirect::route('home');
+
+
+        }
+
+        // Executa o pagamento //
+        $pagamento = Payment::get($id_pagamento, $this->_api_context);
+
+        $execucao_pagamento = new PaymentExecution();
+        $execucao_pagamento->setPayerId(Input::get('PayerID'));
+
+        $result = $pagamento->execute($execucao_pagamento, $this->_api_context);
+
+        if ($result->getState() == 'approved') {
+
+            \Session::put('sucesso', 'Pagamento realizado com sucesso!');
+            return redirect::route('home');
+
+        }
+
+        \Session::put('erro', 'Falha na transaçao');
+        return redirect::route('home');
+
+
+    }
+
+
+
 
 }

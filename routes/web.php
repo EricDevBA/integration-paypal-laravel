@@ -10,10 +10,10 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::post('/pagar', 'PagamentoController@pagarComPaypal')->name('pagar_com_paypal');
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::post('/pagar', 'PagamentoController@pagarComPaypal')->name('pagar_com_paypal');
 

@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\URL;
 use Faker\Provider\sk_SK\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Redirect;
 use PayPal\Api\Amount;
 use PayPal\Api\Item;
 use PayPal\Api\ItemList;
@@ -14,7 +16,7 @@ use PayPal\Api\RedirectUrls;
 use PayPal\Api\Transaction;
 use PayPal\Auth\OAuthTokenCredential;
 use PayPal\Rest\ApiContext;
-use PhpParser\Node\Stmt\Foreach_;
+//use PhpParser\Node\Stmt\Foreach_;
 
 class PagamentoController extends Controller
 {
@@ -69,7 +71,7 @@ class PagamentoController extends Controller
 
             } catch(\Paypal\Exception\PayPalConnectionException $e) {
 
-                if (\Config::get('app_debug')){\
+                if (\Config::get('app_debug')){
 
                     Session::put('error','Tempo Limite de Conexão Excedido');
                         return RedirectUrls::route('home');
@@ -96,8 +98,9 @@ class PagamentoController extends Controller
     Session::put('pagamento_paypal_id', $pagamento->getId());
 
     if(isset($url_redirecionar)){
-
+       return Redirect::away($url_redirecionar);
     }
+
 
 }
 

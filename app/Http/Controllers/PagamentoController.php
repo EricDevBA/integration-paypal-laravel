@@ -7,6 +7,8 @@ use Faker\Provider\sk_SK\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Session;
+
 use PayPal\Api\Amount;
 use PayPal\Api\Item;
 use PayPal\Api\ItemList;
@@ -16,7 +18,6 @@ use PayPal\Api\RedirectUrls;
 use PayPal\Api\Transaction;
 use PayPal\Auth\OAuthTokenCredential;
 use PayPal\Rest\ApiContext;
-//use PhpParser\Node\Stmt\Foreach_;
 
 class PagamentoController extends Controller
 {
@@ -36,6 +37,11 @@ class PagamentoController extends Controller
 
         $this->_api_context->setConfig($paypal_conf['settings']);
 
+    }
+
+    public function index()
+    {
+        return view('welcome');
     }
 
 
@@ -74,12 +80,12 @@ class PagamentoController extends Controller
                 if (\Config::get('app_debug')){
 
                     Session::put('error','Tempo Limite de Conexão Excedido');
-                        return RedirectUrls::route('home');
+                        return RedirectUrls::route('/');
 
 
                 }else{\
                     Session::put('error', 'Serviço fora do ar');
-                        return RedirectUrls::route('home');
+                        return RedirectUrls::route('/');
 
                 }
 
@@ -114,7 +120,7 @@ class PagamentoController extends Controller
         if(empty(Input::get('PayerID')) || empty(Input::get('token'))) {
 
             \Session::put('erro','Falha na Transação.');
-            return Redirect::route('home');
+            return Redirect::route('/');
 
 
         }
@@ -130,12 +136,12 @@ class PagamentoController extends Controller
         if ($result->getState() == 'approved') {
 
             \Session::put('sucesso', 'Pagamento realizado com sucesso!');
-            return redirect::route('home');
+            return redirect::route('/');
 
         }
 
         \Session::put('erro', 'Falha na transaçao');
-        return redirect::route('home');
+        return redirect::route('/');
 
 
     }
